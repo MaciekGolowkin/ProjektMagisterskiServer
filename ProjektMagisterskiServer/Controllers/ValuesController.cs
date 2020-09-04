@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using ProjektMagisterskiServer.Models;
 
 namespace ProjektMagisterskiServer.Controllers
 {
@@ -10,6 +11,12 @@ namespace ProjektMagisterskiServer.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
+
+        public ValuesController(AuthenticationContext context)
+        {
+
+        }
+
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
