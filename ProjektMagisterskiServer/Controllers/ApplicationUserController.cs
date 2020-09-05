@@ -37,7 +37,7 @@ namespace ProjektMagisterskiServer.Controllers
             try
             {
                 var result =await _userManager.CreateAsync(applicationUser,model.Password);
-                return Ok("Dodano pomyślnie użytkownika: "+model.FullName);
+                return Ok(result);
             }
             catch (Exception)
             {
