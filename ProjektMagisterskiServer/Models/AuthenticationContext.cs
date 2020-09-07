@@ -15,5 +15,6 @@ namespace ProjektMagisterskiServer.Models
         }
 
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        //public DbSet<Image> ApplicationImages { get; set; }
     }
 }
