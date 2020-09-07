@@ -25,7 +25,7 @@ namespace ProjektMagisterskiServer.Models
         public string ImgPath { get; set; }
 
         [Column(TypeName = "nvarchar(450)")]
-        public string ApplicationUserId { get; set; }
+        public string ApplicationUserID { get; set; }
 
         [ForeignKey("ApplicationUserID")]
         public ApplicationUser ApplicationUser { get; set; }

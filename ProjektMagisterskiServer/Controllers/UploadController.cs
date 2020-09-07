@@ -75,7 +75,7 @@ namespace ProjektMagisterskiServer.Controllers
                 image.Name = imageModel.Name;
                 image.TypeOfProcessing = imageModel.TypeOfProcessing;
                 var user = _contex.ApplicationUsers.Where(x => x.UserName == imageModel.UserName).FirstOrDefault();
-                image.ApplicationUserId = user.Id;
+                image.ApplicationUserID = user.Id;
                 _contex.Add(image);
                 _contex.SaveChanges();
                 return StatusCode(201);
