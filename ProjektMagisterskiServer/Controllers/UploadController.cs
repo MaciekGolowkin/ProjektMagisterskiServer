@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.IO;
 using System.Net.Http.Headers;
 using ProjektMagisterskiServer.Models;
-
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace ProjektMagisterskiServer.Controllers
 {
@@ -14,12 +15,14 @@ namespace ProjektMagisterskiServer.Controllers
     {
         private readonly AuthenticationContext _contex;
 
-        public UploadController(AuthenticationContext contex)
+        public UploadController(AuthenticationContext contex, UserManager<ApplicationUser> userManager)
         {
             _contex = contex;
         }
 
+
         [HttpPost, DisableRequestSizeLimit]
+        [Authorize]
         public IActionResult Upload()
         {
             try
@@ -51,6 +54,7 @@ namespace ProjektMagisterskiServer.Controllers
 
         [HttpPost, DisableRequestSizeLimit]
         [Route("AddImage")]
+        [Authorize]
         public IActionResult AddImageToUser([FromBody]ImageModel imageModel)
         {
             try
@@ -85,5 +89,31 @@ namespace ProjektMagisterskiServer.Controllers
                 return StatusCode(500, $"Wewnętrzny błąd serwera: {ex}");
             }
         }
+
+
+        //[HttpGet]
+        //[Route("AddImage")]
+        //public IActionResult GetUserImages(string UserName)
+        //{
+        //    try
+        //    {
+        //        if (UserName == null)
+        //        {
+        //            return BadRequest("Obiekt- zdjęcie nie istnieje.");
+        //        }
+
+        //        if (!ModelState.IsValid)
+        //        {
+        //            return BadRequest("Niepoprawna nazwa użytkownika.");
+        //        }
+
+        //        var user = _contex.ApplicationUsers.Where(x => x.UserName == UserName).FirstOrDefault();
+        //        //return _contex.ApplicationImages.Where(x => x.ApplicationUserID == user.Id).ToList();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"Wewnętrzny błąd serwera: {ex}");
+        //    }
+        //}
     }
 }
