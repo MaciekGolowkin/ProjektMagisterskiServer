@@ -11,14 +11,7 @@ namespace ProjektMagisterskiServer.Controllers
 {
     public class InternalController : ControllerBase
     {
-        private UserManager<ApplicationUser> _userManager;
-
-        public InternalController(UserManager<ApplicationUser> userManager)
-        {
-            _userManager = userManager;
-        }
-
-        protected async Task<ApplicationUser> GetActualUserAsync()
+        protected async Task<ApplicationUser> GetActualUserAsync(UserManager<ApplicationUser> _userManager)
         {
             string userId = User.Claims.First(c => c.Type == "UserID").Value;
             return await _userManager.FindByIdAsync(userId);

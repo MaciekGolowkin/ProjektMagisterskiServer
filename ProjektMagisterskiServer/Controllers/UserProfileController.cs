@@ -13,19 +13,17 @@ namespace ProjektMagisterskiServer.Controllers
     public class UserProfileController : InternalController
     {
         private UserManager<ApplicationUser> _userManager;
-        public UserProfileController(UserManager<ApplicationUser> userManager):base(userManager)
+        public UserProfileController(UserManager<ApplicationUser> userManager)
         {
             _userManager = userManager;
         }
-
         [HttpGet]
         [Authorize]
         public async Task<Object> GetUserProfile()
         {
-            ApplicationUser _actualUser = await GetActualUserAsync();
+            ApplicationUser _actualUser = await GetActualUserAsync(_userManager);
             return new
             {
-                _actualUser.Id,
                 _actualUser.FullName,
                 _actualUser.Email,
                 _actualUser.UserName
