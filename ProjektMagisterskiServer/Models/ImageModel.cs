@@ -6,8 +6,6 @@ namespace ProjektMagisterskiServer.Models
 {
     public class ImageModel
     {
-        public string UserName;
-
         [Column(TypeName = "nvarchar(100)")]
         [Required]
         public string Name { get; set; }

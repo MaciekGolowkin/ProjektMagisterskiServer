@@ -6,18 +6,21 @@ using System.Net.Http.Headers;
 using ProjektMagisterskiServer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using System.Threading.Tasks;
 
 namespace ProjektMagisterskiServer.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UploadController : ControllerBase
+    public class UploadController : InternalController
     {
         private readonly AuthenticationContext _contex;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public UploadController(AuthenticationContext contex, UserManager<ApplicationUser> userManager)
         {
             _contex = contex;
+            _userManager = userManager;
         }
 
 
@@ -55,7 +58,7 @@ namespace ProjektMagisterskiServer.Controllers
         [HttpPost, DisableRequestSizeLimit]
         [Route("AddImage")]
         [Authorize]
-        public IActionResult AddImageToUser([FromBody]ImageModel imageModel)
+        public async Task<IActionResult> AddImageToUserAsync([FromBody]ImageModel imageModel)
         {
             try
             {
@@ -78,7 +81,9 @@ namespace ProjektMagisterskiServer.Controllers
                 image.Width = imageModel.Width;
                 image.Name = imageModel.Name;
                 image.TypeOfProcessing = imageModel.TypeOfProcessing;
-                var user = _contex.ApplicationUsers.Where(x => x.UserName == imageModel.UserName).FirstOrDefault();
+
+                ApplicationUser user = await GetActualUserAsync(_userManager);
+
                 image.ApplicationUserID = user.Id;
                 _contex.Add(image);
                 _contex.SaveChanges();
