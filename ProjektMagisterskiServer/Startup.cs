@@ -55,6 +55,8 @@ namespace ProjektMagisterskiServer
                 o.MemoryBufferThreshold = int.MaxValue;
             });
 
+            services.AddDirectoryBrowser();
+
 
             //klucz jest unikalny- należy zmienić przy postawieniu aplikacji dla klienta/ swoim developowaniu - powinien stanowić informację niejawną
             var key = Encoding.UTF8.GetBytes(Configuration["ApplicationSettings:JWT_Secret"].ToString());
@@ -101,6 +103,12 @@ namespace ProjektMagisterskiServer
             {
                 FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Resources")),
                 RequestPath = new PathString("/Resources")
+            });
+            app.UseDirectoryBrowser(new DirectoryBrowserOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                Path.Combine(Directory.GetCurrentDirectory(), @"Resources")),
+                RequestPath = "/Resources"
             });
 
 

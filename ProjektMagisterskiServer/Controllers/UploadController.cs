@@ -37,7 +37,14 @@ namespace ProjektMagisterskiServer.Controllers
                 {
                     var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
                     var fullPath = Path.Combine(pathToSave, fileName);
-                    var dbPath = Path.Combine(folderName, fileName);
+                    int count = 0;
+                    while (System.IO.File.Exists(fullPath))
+                    {
+                        count++;
+                        fileName = fileName.Replace(".jpg",$"({count}).jpg");
+                        fullPath = Path.Combine(pathToSave, fileName);
+                    }
+                    var dbPath = Path.Combine(folderName, fileName).Replace("\\", "//");
                     using (var stream = new FileStream(fullPath, FileMode.Create))
                     {
                         file.CopyTo(stream);

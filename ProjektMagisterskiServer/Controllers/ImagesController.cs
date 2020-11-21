@@ -27,10 +27,18 @@ namespace ProjektMagisterskiServer.Controllers
         [Route("GetImagesRegistry")]
         [Authorize]
         [HttpGet]
-        public async Task<IQueryable<Image>> GetRegistryOfIagesAsync()
+        public async Task<ImageModel[]> GetRegistryOfIagesAsync()
         {
             ApplicationUser user = await GetActualUserAsync(_userManager);
-            var userImages = _contex.ApplicationImages.Where(x => x.ApplicationUserID == user.Id);
+            var images = _contex.ApplicationImages.Where(x => x.ApplicationUserID == user.Id);
+
+            var userImages = images
+                        .Select(i => new ImageModel { ImgPath = i.ImgPath.Replace("\\","//"), Name = i.Name,
+                            Description = i.Description, Length = i.Length,
+                            TypeOfProcessing = i.TypeOfProcessing, Width = i.Width })
+                        .Distinct()
+                        .OrderByDescending(i => i.Name)
+                        .ToArray();
             return userImages;
         }
 
@@ -40,7 +48,7 @@ namespace ProjektMagisterskiServer.Controllers
         public ActionResult DeleteImage(Guid id)
         {
             var image = _contex.ApplicationImages.Where(x => x.ImageID == id).FirstOrDefault();
-            if (image==null) NotFound($"Wskazany obraz o id : {id} nie istnieje");
+            if (image == null) NotFound($"Wskazany obraz o id : {id} nie istnieje");
 
             _contex.ApplicationImages.Remove(image);
             _contex.SaveChanges();
