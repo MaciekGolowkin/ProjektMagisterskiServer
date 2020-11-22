@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <Folder Include="Helpers\" />
-    <Folder Include="Resources\Images\" />
+    <Folder Include="Resources\Images\Asiunia\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 

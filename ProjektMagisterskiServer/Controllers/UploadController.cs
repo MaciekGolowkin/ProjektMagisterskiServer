@@ -30,11 +30,14 @@ namespace ProjektMagisterskiServer.Controllers
         {
             try
             {
+                //this.CreateImageOperation();
+                ApplicationUser user = await GetActualUserAsync(_userManager);
                 var req = Request;
                 var imageDetailsString = Request.Form["detailsOfImage"];
                 ImageModel imageModel = Newtonsoft.Json.JsonConvert.DeserializeObject<ImageModel>(imageDetailsString);
                 var file = Request.Form.Files[0];
-                var folderName = Path.Combine("Resources", "Images");
+                var partialFolderName= Path.Combine("Resources", "Images");
+                var folderName = Path.Combine(partialFolderName, user.UserName);
                 var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
                 if (file.Length > 0)
                 {
@@ -52,7 +55,6 @@ namespace ProjektMagisterskiServer.Controllers
                     {
                         file.CopyTo(stream);
                     }
-
 
                     if (imageModel == null)
                     {
@@ -74,9 +76,6 @@ namespace ProjektMagisterskiServer.Controllers
                     image.Name = imageModel.Name;
                     image.ImgPath = dbPath;
                     image.TypeOfProcessing = imageModel.TypeOfProcessing;
-
-                    ApplicationUser user = await GetActualUserAsync(_userManager);
-
                     image.ApplicationUserID = user.Id;
                     _contex.Add(image);
                     _contex.SaveChanges();
@@ -92,5 +91,22 @@ namespace ProjektMagisterskiServer.Controllers
                 return StatusCode(500, $"Internal server error: {ex}");
             }
         }
+
+
+        //private void CreateImageOperation()
+        //{
+        //    string sourceFile = @"Resources\WyciecieSzarosci.m";
+        //    string destinationFile = @"Resources\Images\Asiunia\test.m";
+        //    System.IO.File.Copy(sourceFile, destinationFile, true);
+
+        //    MLApp.MLApp matlab = new MLApp.MLApp();
+        //    matlab.Execute(@"cd C:\Users\Maciek\Desktop\MatlabTest");
+        //    object result = null;
+
+        //    matlab.Feval("FunkcjaDzialajaca", 1, out result, finalArray);
+
+        //    //return "s";
+        //}
+
     }
 }
