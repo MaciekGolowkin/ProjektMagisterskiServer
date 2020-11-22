@@ -26,10 +26,13 @@ namespace ProjektMagisterskiServer.Controllers
 
         [HttpPost, DisableRequestSizeLimit]
         [Authorize]
-        public IActionResult Upload()
+        public async Task<IActionResult> UploadAsync()
         {
             try
             {
+                var req = Request;
+                var imageDetailsString = Request.Form["detailsOfImage"];
+                ImageModel imageModel = Newtonsoft.Json.JsonConvert.DeserializeObject<ImageModel>(imageDetailsString);
                 var file = Request.Form.Files[0];
                 var folderName = Path.Combine("Resources", "Images");
                 var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
@@ -49,7 +52,35 @@ namespace ProjektMagisterskiServer.Controllers
                     {
                         file.CopyTo(stream);
                     }
-                    return Ok(new { dbPath });
+
+
+                    if (imageModel == null)
+                    {
+                        return BadRequest("Obiekt- zdjęcie nie istnieje");
+                    }
+
+                    if (!ModelState.IsValid)
+                    {
+                        return BadRequest("Niepoprawny obiekt");
+                    }
+
+                    var image = new Image();
+
+                    image.ImageID = Guid.NewGuid();
+                    image.Description = imageModel.Description;
+                    image.ImgPath = imageModel.ImgPath;
+                    image.Length = imageModel.Length;
+                    image.Width = imageModel.Width;
+                    image.Name = imageModel.Name;
+                    image.ImgPath = dbPath;
+                    image.TypeOfProcessing = imageModel.TypeOfProcessing;
+
+                    ApplicationUser user = await GetActualUserAsync(_userManager);
+
+                    image.ApplicationUserID = user.Id;
+                    _contex.Add(image);
+                    _contex.SaveChanges();
+                    return StatusCode(201);
                 }
                 else
                 {
@@ -61,71 +92,5 @@ namespace ProjektMagisterskiServer.Controllers
                 return StatusCode(500, $"Internal server error: {ex}");
             }
         }
-
-        [HttpPost, DisableRequestSizeLimit]
-        [Route("AddImage")]
-        [Authorize]
-        public async Task<IActionResult> AddImageToUserAsync([FromBody]ImageModel imageModel)
-        {
-            try
-            {
-                if (imageModel == null)
-                {
-                    return BadRequest("Obiekt- zdjęcie nie istnieje");
-                }
-
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest("Niepoprawny obiekt");
-                }
-
-                var image = new Image();
-
-                image.ImageID = Guid.NewGuid();
-                image.Description = imageModel.Description;
-                image.ImgPath = imageModel.ImgPath;
-                image.Length = imageModel.Length;
-                image.Width = imageModel.Width;
-                image.Name = imageModel.Name;
-                image.TypeOfProcessing = imageModel.TypeOfProcessing;
-
-                ApplicationUser user = await GetActualUserAsync(_userManager);
-
-                image.ApplicationUserID = user.Id;
-                _contex.Add(image);
-                _contex.SaveChanges();
-                return StatusCode(201);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Wewnętrzny błąd serwera: {ex}");
-            }
-        }
-
-
-        //[HttpGet]
-        //[Route("AddImage")]
-        //public IActionResult GetUserImages(string UserName)
-        //{
-        //    try
-        //    {
-        //        if (UserName == null)
-        //        {
-        //            return BadRequest("Obiekt- zdjęcie nie istnieje.");
-        //        }
-
-        //        if (!ModelState.IsValid)
-        //        {
-        //            return BadRequest("Niepoprawna nazwa użytkownika.");
-        //        }
-
-        //        var user = _contex.ApplicationUsers.Where(x => x.UserName == UserName).FirstOrDefault();
-        //        //return _contex.ApplicationImages.Where(x => x.ApplicationUserID == user.Id).ToList();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, $"Wewnętrzny błąd serwera: {ex}");
-        //    }
-        //}
     }
 }
