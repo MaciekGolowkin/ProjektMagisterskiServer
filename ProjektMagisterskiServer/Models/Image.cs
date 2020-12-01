@@ -23,6 +23,7 @@ namespace ProjektMagisterskiServer.Models
         public long Width { get; set; }
 
         public string ImgPath { get; set; }
+        public string ProcessedImgPath { get; set; }
 
         [Column(TypeName = "nvarchar(450)")]
         public string ApplicationUserID { get; set; }

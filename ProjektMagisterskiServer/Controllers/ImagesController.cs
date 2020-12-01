@@ -33,7 +33,9 @@ namespace ProjektMagisterskiServer.Controllers
             var images = _contex.ApplicationImages.Where(x => x.ApplicationUserID == user.Id);
 
             var userImages = images
-                        .Select(i => new ImageModel { ImgPath = i.ImgPath.Replace("\\","//"), Name = i.Name,
+                        .Select(i => new ImageModel { ImgPath = i.ImgPath.Replace("\\","//"),
+                            ProcessedImgPath = i.ProcessedImgPath.Replace("\\", "//"),
+                            Name = i.Name,
                             Description = i.Description, Length = i.Length,
                             TypeOfProcessing = i.TypeOfProcessing, Width = i.Width })
                         .Distinct()

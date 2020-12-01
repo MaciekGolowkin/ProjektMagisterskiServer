@@ -7,8 +7,8 @@ using ProjektMagisterskiServer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
-using IronPython.Hosting;
 using System.Diagnostics;
+using System.ComponentModel;
 
 namespace ProjektMagisterskiServer.Controllers
 {
@@ -32,11 +32,12 @@ namespace ProjektMagisterskiServer.Controllers
         {
             try
             {
-                //this.CreateImageOperation();
                 ApplicationUser user = await GetActualUserAsync(_userManager);
                 var req = Request;
                 var imageDetailsString = Request.Form["detailsOfImage"];
                 ImageModel imageModel = Newtonsoft.Json.JsonConvert.DeserializeObject<ImageModel>(imageDetailsString);
+                var cropPropertiesString = Request.Form["cropproperites"];
+                ImageCropProp cropProperties = Newtonsoft.Json.JsonConvert.DeserializeObject<ImageCropProp>(cropPropertiesString);
                 var file = Request.Form.Files[0];
                 var partialFolderName= Path.Combine("Resources", "Images");
                 var folderName = Path.Combine(partialFolderName, user.UserName);
@@ -68,10 +69,7 @@ namespace ProjektMagisterskiServer.Controllers
                         return BadRequest("Niepoprawny obiekt");
                     }
 
-                this.CreateImageOperation(@"C:\Users\Maciek\Desktop\PracaMagisterska\Glowny.JPG", "pobranePrzetworzone.png");
-
-                //MatlabConnector.MatlabConnection.WyciecieSzarosci();
-                //Ima
+                string processedImgPath = this.CreateImageOperation(fileName,user);
 
                 var image = new Image();
 
@@ -82,6 +80,7 @@ namespace ProjektMagisterskiServer.Controllers
                     image.Width = imageModel.Width;
                     image.Name = imageModel.Name;
                     image.ImgPath = dbPath;
+                    image.ProcessedImgPath = processedImgPath;
                     image.TypeOfProcessing = imageModel.TypeOfProcessing;
                     image.ApplicationUserID = user.Id;
                     _contex.Add(image);
@@ -100,17 +99,16 @@ namespace ProjektMagisterskiServer.Controllers
 }
 
 
-        private void CreateImageOperation(string originalImageName,string processedImageName)
+        private string CreateImageOperation(string originalImageName, ApplicationUser user, TypeOfProcessing typeOfProcessing =TypeOfProcessing.Brak)
         {
             ProcessStartInfo start = new ProcessStartInfo();
             start.FileName = @"C:\\Users\\Maciek\\Desktop\\PracaMagisterska\\TEST.exe";
             string[] args = { "", "", "" };
             args[0] = "C:\\Users\\Maciek\\Desktop\\Mag\\TEST\\TEST\\TEST.py";
-            args[1] = @"C:\Users\Maciek\Desktop\PracaMagisterska\ZaznaczoneKolor.JPG";
-            args[2] = @"C:\Users\Maciek\Desktop\PracaMagisterska\ostatecznycheck.png";
-            //pass these to your Arguements property of your ProcessStartInfo instance
-
-            //start.Arguments = string.Format("{0} {1} {2}", "C:\\Users\\Maciek\\Documents\\Visual Studio 2017\\Projects\\TEST\\TEST\\TEST.py", "C:\\Users\\Maciek\\Desktop\\PracaMagisterska\\ZaznaczoneKolor.JPG", "C:\\Users\\Maciek\\Desktop\\PracaMagisterska\\KONCOWY.png");
+            string userPath = @"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer\Resources\Images\" + user.UserName+ @"\";
+            args[1] = userPath + originalImageName;
+            string processedImage = originalImageName.Replace(".jpg", "Przetworzone.png");
+            args[2] = userPath + processedImage;
             start.Arguments = string.Format("{0} {1} {2}", args[0], args[1], args[2]);
             start.UseShellExecute = false;
             start.RedirectStandardOutput = true;
@@ -122,28 +120,17 @@ namespace ProjektMagisterskiServer.Controllers
 
                 }
             }
+            return $@"Resources\Images\{user.UserName}\{processedImage}";
+        }
 
-            //string sourceFile = @"Resources\WyciecieSzarosci.m";
-            ////string destinationFile = @"Resources\Images\Asiunia\WyciecieSzarosci.m";
-            ////System.IO.File.Copy(sourceFile, destinationFile, true);
-
-            //MLApp.MLApp matlab = new MLApp.MLApp();
-            ////matlab.Execute(@"cd Resources\Images\Asiunia\WyciecieSzarosci.m");
-            //matlab.Execute(@"cd C:\Users\Maciek\Desktop\MatlabTest");
-            //object result = null;
-
-            //matlab.Feval("WyciecieSzarosci", 1, out result, originalImageName, processedImageName);
-            //System.IO.File.Delete(destinationFile);
-
-
-            //MLApp.MLApp matlab = new MLApp.MLApp();
-            //matlab.Execute(@"cd C:\Users\Maciek\Desktop\MatlabTest");
-            //object result = null;
-
-            //matlab.Feval("WyciecieSzarosci", 1, out result, @"C:\Users\Maciek\Desktop\PracaMagisterska\Glowny.JPG", "aafddfssa.png");
-            //object[] res = result as object[];
-
-            //return "s";
+        private enum TypeOfProcessing
+        {
+            [Description("Brak Operacji Przetwarzania")]
+            Brak = 1,
+            [Description("Progowanie")]
+            Progowanie = 2,
+            [Description("Redukcja Poziomów Szarości")]
+            RedukcjaPoziomowSzarosci = 3,
         }
 
     }
