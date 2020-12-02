@@ -69,7 +69,7 @@ namespace ProjektMagisterskiServer.Controllers
                         return BadRequest("Niepoprawny obiekt");
                     }
 
-                string processedImgPath = this.CreateImageOperation(fileName,user);
+                string processedImgPath = this.CreateImageOperation(fileName,user,TypeOfProcessing.Progowanie,cropProperties);
 
                 var image = new Image();
 
@@ -99,17 +99,40 @@ namespace ProjektMagisterskiServer.Controllers
 }
 
 
-        private string CreateImageOperation(string originalImageName, ApplicationUser user, TypeOfProcessing typeOfProcessing =TypeOfProcessing.Brak)
+        private string CreateImageOperation(string originalImageName, ApplicationUser user, TypeOfProcessing typeOfProcessing, ImageCropProp cropProperties)
         {
             ProcessStartInfo start = new ProcessStartInfo();
-            start.FileName = @"C:\\Users\\Maciek\\Desktop\\PracaMagisterska\\TEST.exe";
+
+            string nazwaPliku="";
+
+            switch (typeOfProcessing)
+            {
+                case TypeOfProcessing.Progowanie:
+                    nazwaPliku = "Thresholding";
+                    break;
+                case TypeOfProcessing.RedukcjaPoziomowSzarosci:
+                    nazwaPliku = "ExcludeGray";
+                    break;
+                default:
+                    break;
+            }
+
+            string sourceFile = $@"Resources\{nazwaPliku}.exe";
+            string destinationFile = $"Resources\\Images\\{user.UserName}\\{nazwaPliku}.exe";
+            System.IO.File.Copy(sourceFile, destinationFile, true);
+
+            start.FileName = $@"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer\Resources\Thresholding.exe";
+            //start.FileName = destinationFile;
             string[] args = { "", "", "" };
-            args[0] = "C:\\Users\\Maciek\\Desktop\\Mag\\TEST\\TEST\\TEST.py";
-            string userPath = @"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer\Resources\Images\" + user.UserName+ @"\";
+            //args[0] = "C:\\Users\\Maciek\\Desktop\\Mag\\TEST\\TEST\\TEST.py";
+            //args[0] = $"G:\\ProjektMagisterski\\ProjektMagisterskiServer\\Segmentation\\{nazwaPliku}.py";
+            args[0] = $"G:\\ProjektMagisterski\\ProjektMagisterskiServer\\Segmentation\\Thresholding.py";
+
+            string userPath = @"G:\\ProjektMagisterski\\ProjektMagisterskiServer\\ProjektMagisterskiServer\\Resources\\Images\\" + user.UserName+ @"\\";
             args[1] = userPath + originalImageName;
             string processedImage = originalImageName.Replace(".jpg", "Przetworzone.png");
             args[2] = userPath + processedImage;
-            start.Arguments = string.Format("{0} {1} {2}", args[0], args[1], args[2]);
+            start.Arguments = string.Format("{0} {1} {2} {3} {4} {5} {6}", args[0], args[1], args[2], cropProperties.x1.ToString(), cropProperties.x2.ToString(), cropProperties.y1.ToString(), cropProperties.y2.ToString());
             start.UseShellExecute = false;
             start.RedirectStandardOutput = true;
             using (Process process = Process.Start(start))
@@ -120,18 +143,20 @@ namespace ProjektMagisterskiServer.Controllers
 
                 }
             }
+            System.IO.File.Delete(destinationFile);
             return $@"Resources\Images\{user.UserName}\{processedImage}";
         }
 
         private enum TypeOfProcessing
         {
             [Description("Brak Operacji Przetwarzania")]
-            Brak = 1,
+            Brak,
             [Description("Progowanie")]
-            Progowanie = 2,
+            Progowanie,
             [Description("Redukcja Poziomów Szarości")]
-            RedukcjaPoziomowSzarosci = 3,
+            RedukcjaPoziomowSzarosci,
+            [Description("Metoda k-średnich")]
+            KSrednich
         }
-
     }
 }
