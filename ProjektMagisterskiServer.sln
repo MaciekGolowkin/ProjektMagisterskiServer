@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.1231
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjektMagisterskiServer", "ProjektMagisterskiServer\ProjektMagisterskiServer.csproj", "{7E217106-B39E-4CD9-A6A0-2276D2255233}"
 EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Segmentation", "Segmentation\Segmentation.pyproj", "{2F86CA5E-008B-4424-ABF0-8ECDB254C7D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,8 @@ Global
 		{7E217106-B39E-4CD9-A6A0-2276D2255233}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E217106-B39E-4CD9-A6A0-2276D2255233}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E217106-B39E-4CD9-A6A0-2276D2255233}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F86CA5E-008B-4424-ABF0-8ECDB254C7D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F86CA5E-008B-4424-ABF0-8ECDB254C7D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

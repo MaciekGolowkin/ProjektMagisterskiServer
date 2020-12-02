@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>2f86ca5e-008b-4424-abf0-8ecdb254c7d6</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Segmentation.py</StartupFile>
+    <StartupFile>Thresholding.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -21,7 +21,10 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Segmentation.py" />
+    <Compile Include="ExcludeGray.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Thresholding.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

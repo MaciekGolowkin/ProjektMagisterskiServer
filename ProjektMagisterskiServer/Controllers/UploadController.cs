@@ -101,9 +101,53 @@ namespace ProjektMagisterskiServer.Controllers
 
         private string CreateImageOperation(string originalImageName, ApplicationUser user, TypeOfProcessing typeOfProcessing, ImageCropProp cropProperties)
         {
-            ProcessStartInfo start = new ProcessStartInfo();
+            //ProcessStartInfo start = new ProcessStartInfo();
 
-            string nazwaPliku="";
+            //string nazwaPliku="";
+
+            //switch (typeOfProcessing)
+            //{
+            //    case TypeOfProcessing.Progowanie:
+            //        nazwaPliku = "Thresholding";
+            //        break;
+            //    case TypeOfProcessing.RedukcjaPoziomowSzarosci:
+            //        nazwaPliku = "ExcludeGray";
+            //        break;
+            //    default:
+            //        break;
+            //}
+
+            //string sourceFile = $@"Resources\{nazwaPliku}.exe";
+            //string destinationFile = $"Resources\\Images\\{user.UserName}\\{nazwaPliku}.exe";
+            //System.IO.File.Copy(sourceFile, destinationFile, true);
+
+            ////start.FileName = $@"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer\Resources\Thresholding.exe";
+            //start.FileName = $@"G:\ProjektMagisterski\ProjektMagisterskiServer\Segmentation\dist\Thresholding.exe";
+            ////start.FileName = destinationFile;
+            //string[] args = { "", "", "" };
+            ////args[0] = "C:\\Users\\Maciek\\Desktop\\Mag\\TEST\\TEST\\TEST.py";
+            ////args[0] = $"G:\\ProjektMagisterski\\ProjektMagisterskiServer\\Segmentation\\{nazwaPliku}.py";
+            //args[0] = $"G:\\ProjektMagisterski\\ProjektMagisterskiServer\\Segmentation\\Thresholding.py";
+
+            //string userPath = @"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer\Resources\Images\" + user.UserName+ @"\";
+            //args[1] = userPath + originalImageName;
+            //string processedImage = originalImageName.Replace(".jpg", "Przetworzone.png");
+            //args[2] = userPath + processedImage;
+            //start.Arguments = string.Format("{0} {1} {2} {3} {4} {5} {6}", args[0], args[1], args[2], cropProperties.x1, cropProperties.x2, cropProperties.y1, cropProperties.y2);
+            //start.UseShellExecute = false;
+            //start.RedirectStandardOutput = true;
+            //using (Process process = Process.Start(start))
+            //{
+            //    using (StreamReader reader = process.StandardOutput)
+            //    {
+            //        string result = reader.ReadToEnd();
+
+            //    }
+            //}
+            //System.IO.File.Delete(destinationFile);
+            //return $@"Resources\Images\{user.UserName}\{processedImage}";
+
+            string nazwaPliku = "";
 
             switch (typeOfProcessing)
             {
@@ -116,34 +160,45 @@ namespace ProjektMagisterskiServer.Controllers
                 default:
                     break;
             }
+            string userPath = @"\Resources\Images\" + user.UserName + @"\";
 
-            string sourceFile = $@"Resources\{nazwaPliku}.exe";
-            string destinationFile = $"Resources\\Images\\{user.UserName}\\{nazwaPliku}.exe";
-            System.IO.File.Copy(sourceFile, destinationFile, true);
+            string userExeFile = userPath + $"{nazwaPliku}.exe";
 
-            start.FileName = $@"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer\Resources\Thresholding.exe";
-            //start.FileName = destinationFile;
-            string[] args = { "", "", "" };
-            //args[0] = "C:\\Users\\Maciek\\Desktop\\Mag\\TEST\\TEST\\TEST.py";
-            //args[0] = $"G:\\ProjektMagisterski\\ProjektMagisterskiServer\\Segmentation\\{nazwaPliku}.py";
-            args[0] = $"G:\\ProjektMagisterski\\ProjektMagisterskiServer\\Segmentation\\Thresholding.py";
+            System.IO.File.Copy($@"G:\ProjektMagisterski\ProjektMagisterskiServer\Segmentation\dist\{nazwaPliku}.exe", $@"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer{userExeFile}", true);
 
-            string userPath = @"G:\\ProjektMagisterski\\ProjektMagisterskiServer\\ProjektMagisterskiServer\\Resources\\Images\\" + user.UserName+ @"\\";
-            args[1] = userPath + originalImageName;
+
+            ProcessStartInfo start = new ProcessStartInfo();
+                //start.FileName = @"C:\\Users\\Maciek\\Desktop\\PracaMagisterska\\TEST.exe";
+                start.FileName = $@"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer{userExeFile}";
+                string[] args = { "", "", "" };
+                //args[0] = "C:\\Users\\Maciek\\Desktop\\Mag\\TEST\\TEST\\TEST.py";
+                args[0] = @"G:\ProjektMagisterski\ProjektMagisterskiServer\Segmentation\Thresholding.py";
+
+            //string userPath = @"\Resources\Images\" + user.UserName + @"\";
+            //args[1] = userPath + originalImageName;
+            //args[1] = @"C:\Users\Maciek\Desktop\PracaMagisterska\ZaznaczoneKolor.jpg";
             string processedImage = originalImageName.Replace(".jpg", "Przetworzone.png");
-            args[2] = userPath + processedImage;
-            start.Arguments = string.Format("{0} {1} {2} {3} {4} {5} {6}", args[0], args[1], args[2], cropProperties.x1.ToString(), cropProperties.x2.ToString(), cropProperties.y1.ToString(), cropProperties.y2.ToString());
-            start.UseShellExecute = false;
-            start.RedirectStandardOutput = true;
-            using (Process process = Process.Start(start))
-            {
-                using (StreamReader reader = process.StandardOutput)
-                {
-                    string result = reader.ReadToEnd();
+            args[1] = $@"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer\Resources\Images\{user.UserName}\{originalImageName}";
 
+            //args[2] = userPath + processedImage;
+            args[2] = $@"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer\Resources\Images\{user.UserName}\{processedImage}";
+
+            //args[2] = "C:\\Users\\Maciek\\Desktop\\PracaMagisterska\\GOTOWaaaasssE.png";
+                //args[2] = @"C:\Users\Maciek\Desktop\PracaMagisterska\GOTOWaaaasfvddvfE.png";
+
+                start.Arguments = string.Format("{0} {1} {2} {3} {4} {5} {6}", args[0], args[1], args[2], cropProperties.x1, cropProperties.x2, cropProperties.y1, cropProperties.y2);
+                start.UseShellExecute = false;
+                start.RedirectStandardOutput = true; 
+                using (Process process = Process.Start(start))
+                {
+                    using (StreamReader reader = process.StandardOutput)
+                    {
+                        string result = reader.ReadToEnd();
+                    var x = 2;
+                    }
                 }
-            }
-            System.IO.File.Delete(destinationFile);
+            System.IO.File.Delete($@"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer{userExeFile}");
+
             return $@"Resources\Images\{user.UserName}\{processedImage}";
         }
 
