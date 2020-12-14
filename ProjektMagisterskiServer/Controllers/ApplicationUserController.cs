@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -44,6 +45,11 @@ namespace ProjektMagisterskiServer.Controllers
             try
             {
                 var result =await _userManager.CreateAsync(applicationUser,model.Password);
+                string userPath = $@"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer\Resources\Images\{model.UserName}";
+                if (!Directory.Exists(userPath))
+                {
+                    Directory.CreateDirectory($@"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer\Resources\Images\{model.UserName}");
+                }
                 return Ok(result);
             }
             catch (Exception)

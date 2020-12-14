@@ -2,8 +2,12 @@ import numpy.core.multiarray
 import cv2
 import numpy as np
 
-def ExcludeGray(pathOfImage,destinationPath,x1,x2,y1,y2):
+def ExcludeGray(pathOfImage,destinationPath,x1str,x2str,y1str,y2str):
     img = cv2.imread(pathOfImage)  
+    x1=int(x1str);
+    x2=int(x2str);
+    y1=int(y1str);
+    y2=int(y2str);
 
     redChannel =img[:,:,2].astype(np.float)
     greenChannel = img[:,:,1].astype(np.float)

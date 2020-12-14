@@ -33,7 +33,7 @@ namespace ProjektMagisterskiServer.Controllers
             var images = _contex.ApplicationImages.Where(x => x.ApplicationUserID == user.Id);
 
             var userImages = images
-                        .Select(i => new ImageModel { ImgPath = i.ImgPath.Replace("\\","//"),
+                        .Select(i => new ImageModel { ImgPath = i.ImgPath.Replace("\\", "//"),
                             ProcessedImgPath = i.ProcessedImgPath.Replace("\\", "//"),
                             Name = i.Name,
                             Description = i.Description, Length = i.Length,
@@ -44,18 +44,34 @@ namespace ProjektMagisterskiServer.Controllers
             return userImages;
         }
 
-        [Route("GetImagesRegistry/{id}")]
+        //[Route("GetImagesRegistry/{id}")]
+        //[Authorize]
+        //[HttpDelete]
+        //public ActionResult DeleteImage(Guid id)
+        //{
+        //    var image = _contex.ApplicationImages.Where(x => x.ImageID == id).FirstOrDefault();
+        //    if (image == null) NotFound($"Wskazany obraz o id : {id} nie istnieje");
+
+        //    _contex.ApplicationImages.Remove(image);
+        //    _contex.SaveChanges();
+
+        //    return Ok("Zdjęcie zostało usunięte pomyślnie");
+        //}
+
         [Authorize]
-        [HttpDelete]
-        public ActionResult DeleteImage(Guid id)
+        [Route("DeleteImage/{name}")]
+        [HttpDelete("{name}")]
+        public ActionResult DeleteImage(string name)
         {
-            var image = _contex.ApplicationImages.Where(x => x.ImageID == id).FirstOrDefault();
-            if (image == null) NotFound($"Wskazany obraz o id : {id} nie istnieje");
+
+            //string name = "aaaa";
+            var image = _contex.ApplicationImages.Where(x => x.Name == name).FirstOrDefault();
+            if (image == null) NotFound($"Wskazany obraz o nazwie : {name} nie istnieje");
 
             _contex.ApplicationImages.Remove(image);
             _contex.SaveChanges();
 
-            return Ok("Zdjęcie zostało usunięte pomyślnie");
+            return Ok();
         }
 
     }

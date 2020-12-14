@@ -38,6 +38,8 @@ namespace ProjektMagisterskiServer.Controllers
                 ImageModel imageModel = Newtonsoft.Json.JsonConvert.DeserializeObject<ImageModel>(imageDetailsString);
                 var cropPropertiesString = Request.Form["cropproperites"];
                 ImageCropProp cropProperties = Newtonsoft.Json.JsonConvert.DeserializeObject<ImageCropProp>(cropPropertiesString);
+                var typeOfProcessing = Request.Form["typeOfProcessing"];
+                Enum.TryParse(typeOfProcessing, out TypeOfProcessing createdEnum);
                 var file = Request.Form.Files[0];
                 var partialFolderName= Path.Combine("Resources", "Images");
                 var folderName = Path.Combine(partialFolderName, user.UserName);
@@ -69,10 +71,28 @@ namespace ProjektMagisterskiServer.Controllers
                         return BadRequest("Niepoprawny obiekt");
                     }
 
-                string processedImgPath = this.CreateImageOperation(fileName,user,TypeOfProcessing.Progowanie,cropProperties);
+                    string processedImgPath = "";
 
-                var image = new Image();
+                    if ( createdEnum != TypeOfProcessing.Brak)  processedImgPath = this.CreateImageOperation(fileName, user, createdEnum, cropProperties);
 
+                    string EnumVariableDisplay = "Brak Operacji Przetwarzania";
+                    switch (createdEnum)
+                    {
+                        case TypeOfProcessing.Progowanie:
+                            EnumVariableDisplay = "Progowanie";
+                            break;
+                        case TypeOfProcessing.KSrednich:
+                            EnumVariableDisplay = "Metoda k-średnich";
+                            break;
+                        case TypeOfProcessing.RedukcjaPoziomowSzarosci:
+                            EnumVariableDisplay = "Redukcja Poziomów Szarości";
+                            break;
+                        default:
+                            EnumVariableDisplay = "Brak Operacji Przetwarzania";
+                            break;
+                    }
+
+                    var image = new Image();
                     image.ImageID = Guid.NewGuid();
                     image.Description = imageModel.Description;
                     image.ImgPath = imageModel.ImgPath;
@@ -81,7 +101,7 @@ namespace ProjektMagisterskiServer.Controllers
                     image.Name = imageModel.Name;
                     image.ImgPath = dbPath;
                     image.ProcessedImgPath = processedImgPath;
-                    image.TypeOfProcessing = imageModel.TypeOfProcessing;
+                    image.TypeOfProcessing = EnumVariableDisplay;
                     image.ApplicationUserID = user.Id;
                     _contex.Add(image);
                     _contex.SaveChanges();
@@ -101,105 +121,52 @@ namespace ProjektMagisterskiServer.Controllers
 
         private string CreateImageOperation(string originalImageName, ApplicationUser user, TypeOfProcessing typeOfProcessing, ImageCropProp cropProperties)
         {
-            //ProcessStartInfo start = new ProcessStartInfo();
+           string nazwaPliku = "";
 
-            //string nazwaPliku="";
-
-            //switch (typeOfProcessing)
-            //{
-            //    case TypeOfProcessing.Progowanie:
-            //        nazwaPliku = "Thresholding";
-            //        break;
-            //    case TypeOfProcessing.RedukcjaPoziomowSzarosci:
-            //        nazwaPliku = "ExcludeGray";
-            //        break;
-            //    default:
-            //        break;
-            //}
-
-            //string sourceFile = $@"Resources\{nazwaPliku}.exe";
-            //string destinationFile = $"Resources\\Images\\{user.UserName}\\{nazwaPliku}.exe";
-            //System.IO.File.Copy(sourceFile, destinationFile, true);
-
-            ////start.FileName = $@"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer\Resources\Thresholding.exe";
-            //start.FileName = $@"G:\ProjektMagisterski\ProjektMagisterskiServer\Segmentation\dist\Thresholding.exe";
-            ////start.FileName = destinationFile;
-            //string[] args = { "", "", "" };
-            ////args[0] = "C:\\Users\\Maciek\\Desktop\\Mag\\TEST\\TEST\\TEST.py";
-            ////args[0] = $"G:\\ProjektMagisterski\\ProjektMagisterskiServer\\Segmentation\\{nazwaPliku}.py";
-            //args[0] = $"G:\\ProjektMagisterski\\ProjektMagisterskiServer\\Segmentation\\Thresholding.py";
-
-            //string userPath = @"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer\Resources\Images\" + user.UserName+ @"\";
-            //args[1] = userPath + originalImageName;
-            //string processedImage = originalImageName.Replace(".jpg", "Przetworzone.png");
-            //args[2] = userPath + processedImage;
-            //start.Arguments = string.Format("{0} {1} {2} {3} {4} {5} {6}", args[0], args[1], args[2], cropProperties.x1, cropProperties.x2, cropProperties.y1, cropProperties.y2);
-            //start.UseShellExecute = false;
-            //start.RedirectStandardOutput = true;
-            //using (Process process = Process.Start(start))
-            //{
-            //    using (StreamReader reader = process.StandardOutput)
-            //    {
-            //        string result = reader.ReadToEnd();
-
-            //    }
-            //}
-            //System.IO.File.Delete(destinationFile);
-            //return $@"Resources\Images\{user.UserName}\{processedImage}";
-
-            string nazwaPliku = "";
-
-            switch (typeOfProcessing)
-            {
-                case TypeOfProcessing.Progowanie:
-                    nazwaPliku = "Thresholding";
-                    break;
-                case TypeOfProcessing.RedukcjaPoziomowSzarosci:
-                    nazwaPliku = "ExcludeGray";
+           switch (typeOfProcessing)
+           {
+               case TypeOfProcessing.Progowanie:
+                   nazwaPliku = "Thresholding";
+                   break;
+               case TypeOfProcessing.RedukcjaPoziomowSzarosci:
+                   nazwaPliku = "ExcludeGray";
+                   break;
+                case TypeOfProcessing.KSrednich:
+                    nazwaPliku = "KMeans";
                     break;
                 default:
-                    break;
-            }
-            string userPath = @"\Resources\Images\" + user.UserName + @"\";
+                   break;
+           }
+           string userPath = @"\Resources\Images\" + user.UserName + @"\";
 
-            string userExeFile = userPath + $"{nazwaPliku}.exe";
+           string userExeFile = userPath + $"{nazwaPliku}.exe";
 
-            System.IO.File.Copy($@"G:\ProjektMagisterski\ProjektMagisterskiServer\Segmentation\dist\{nazwaPliku}.exe", $@"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer{userExeFile}", true);
+           System.IO.File.Copy($@"G:\ProjektMagisterski\ProjektMagisterskiServer\Segmentation\dist\{nazwaPliku}.exe", $@"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer{userExeFile}", true);
 
 
-            ProcessStartInfo start = new ProcessStartInfo();
-                //start.FileName = @"C:\\Users\\Maciek\\Desktop\\PracaMagisterska\\TEST.exe";
-                start.FileName = $@"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer{userExeFile}";
-                string[] args = { "", "", "" };
-                //args[0] = "C:\\Users\\Maciek\\Desktop\\Mag\\TEST\\TEST\\TEST.py";
-                args[0] = @"G:\ProjektMagisterski\ProjektMagisterskiServer\Segmentation\Thresholding.py";
+           ProcessStartInfo start = new ProcessStartInfo();
+           start.FileName = $@"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer{userExeFile}";
+           string[] args = { "", "", "" };
+           args[0] = $@"G:\ProjektMagisterski\ProjektMagisterskiServer\Segmentation\{nazwaPliku}.py";
 
-            //string userPath = @"\Resources\Images\" + user.UserName + @"\";
-            //args[1] = userPath + originalImageName;
-            //args[1] = @"C:\Users\Maciek\Desktop\PracaMagisterska\ZaznaczoneKolor.jpg";
-            string processedImage = originalImageName.Replace(".jpg", "Przetworzone.png");
-            args[1] = $@"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer\Resources\Images\{user.UserName}\{originalImageName}";
+           string processedImage = originalImageName.Replace(".jpg", "Przetworzone.png");
+           args[1] = $@"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer\Resources\Images\{user.UserName}\{originalImageName}";
 
-            //args[2] = userPath + processedImage;
-            args[2] = $@"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer\Resources\Images\{user.UserName}\{processedImage}";
+           args[2] = $@"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer\Resources\Images\{user.UserName}\{processedImage}";
 
-            //args[2] = "C:\\Users\\Maciek\\Desktop\\PracaMagisterska\\GOTOWaaaasssE.png";
-                //args[2] = @"C:\Users\Maciek\Desktop\PracaMagisterska\GOTOWaaaasfvddvfE.png";
-
-                start.Arguments = string.Format("{0} {1} {2} {3} {4} {5} {6}", args[0], args[1], args[2], cropProperties.x1, cropProperties.x2, cropProperties.y1, cropProperties.y2);
-                start.UseShellExecute = false;
-                start.RedirectStandardOutput = true; 
-                using (Process process = Process.Start(start))
-                {
-                    using (StreamReader reader = process.StandardOutput)
-                    {
-                        string result = reader.ReadToEnd();
-                    var x = 2;
-                    }
-                }
-            System.IO.File.Delete($@"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer{userExeFile}");
-
-            return $@"Resources\Images\{user.UserName}\{processedImage}";
+           start.Arguments = string.Format("{0} {1} {2} {3} {4} {5} {6}", args[0], args[1], args[2], cropProperties.y1, cropProperties.y2, cropProperties.x1, cropProperties.x2);
+           start.UseShellExecute = false;
+           start.RedirectStandardOutput = true; 
+           using (Process process = Process.Start(start))
+           {
+               using (StreamReader reader = process.StandardOutput)
+               {
+                   string result = reader.ReadToEnd();
+               var x = 2;
+               }
+           }
+           System.IO.File.Delete($@"G:\ProjektMagisterski\ProjektMagisterskiServer\ProjektMagisterskiServer{userExeFile}");
+           return $@"Resources\Images\{user.UserName}\{processedImage}";
         }
 
         private enum TypeOfProcessing
